@@ -8,11 +8,11 @@ import RPi.GPIO as GPIO
 fanPin = 17
 desiredTmp = 45
 class PIDs:
-	p = 40
+	p = 45
 	i = 15
 	d = 30
 	integral = 0
-	delta_t = 3
+	delta_t = 3	# it means that every 3 seconds the program is going to check the temperature set the new speed of the fan
 	previousValue = desiredTmp
 
 def getCpuTmp():
@@ -27,9 +27,14 @@ def PIDcontroller(realValue, setPoint):
 	print('error: ' + str(error))
 	P = PIDs.p*error
 	print('P: ' + str(P))
-	PIDs.integral += error
-	I = PIDs.i*PIDs.integral
-	print('I: ' + str(I))
+	if PIDs.integral < 0:	# we do not want the integral to be negative, because we do not want the pi to be sad if it is under 45 degrees
+		print('PIDs integral would be more negative (we do not want that)')
+		PIDs.integral = 0
+		I = 0
+	else:
+		PIDs.integral += error
+		I = PIDs.i*PIDs.integral
+		print('I: ' + str(I))
 	derivate = (PIDs.previousValue - realValue)/PIDs.delta_t
 	PIDs.previousValue = realValue
 	D = PIDs.d*derivate
