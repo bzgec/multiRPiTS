@@ -1,10 +1,10 @@
-# multiPiTS - multifunction Raspberry Pi with ThingSpeak
+# multiRPiTS - multifunction Raspberry Pi with ThingSpeak
 - PID-fan-controller
 - measuring room temperature and humidity
-- uploading data to https://thingspeak.com/ (average CPU temperature, average dutyCycle of the fan, current temperature and humidity of the room in which the Raspberry Pi is located
+- uploading data to https://thingspeak.com/channels/342779 (average CPU temperature, average fan speed, current temperature and humidity of the room in which the Raspberry Pi is located
 
 # PID-fan-controller
-For controlling fan of Raspberry Pi with Raspbian OS
+For controlling fan of Raspberry Pi with Raspbian OS.
 
 This code is inspired by Andreas Spiess and his YouTube channel https://www.youtube.com/channel/UCu7_D0o48KbfhpEohoP7YSQ.
 
