@@ -25,6 +25,7 @@ tmpSum = 0
 dutyCycleSum = 0
 measurements = 0
 
+uploadTime = 30*60	# uploads data to ThingSpeak every 30 minutes
 lastUploadTime = 0
 class PIDs:
 	p = 45
@@ -110,14 +111,14 @@ def handleFan():
 	print('')
 	return()
 def postToThingSpeak():
-	global measurements, tmpSum, dutyCycleSum, lastUploadTime, tmp, dutyCycle
+	global measurements, tmpSum, dutyCycleSum, lastUploadTime, tmp, dutyCycle, uploadTime
 
 	tmpSum += float(tmp)
 	dutyCycleSum += dutyCycle
 	measurements += 1
 
 	currentTime = time()
-	if currentTime-lastUploadTime >= 10*60:		# 10 minutes, time() return seconds
+	if currentTime-lastUploadTime >= uploadTime:
 		# Try to grab a sensor reading.  Use the read_retry method which will retry up
 		# to 15 times to get a sensor reading (waiting 2 seconds between each retry).
 		humidityDHT, temperatureDHT = Adafruit_DHT.read_retry(sensor, DHTpin)
