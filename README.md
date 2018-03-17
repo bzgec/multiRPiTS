@@ -4,10 +4,6 @@
 - uploading data to https://thingspeak.com/channels/342779 (average CPU temperature, average fan speed, current temperature and humidity of the room in which the Raspberry Pi is located
 - displaying data on OLED display (SSD1306 128x64 screen with I2C)
 
-
-# PID-fan-controller
-For controlling fan on Raspberry Pi.
-
 # DHT22
 Follow this instrucions for DHT22 sensor (step 7):
 http://www.instructables.com/id/Raspberry-PI-and-DHT22-temperature-and-humidity-lo/
