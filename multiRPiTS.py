@@ -248,8 +248,8 @@ try:
 		draw.text((x, heightOLED-2*(fontSize+linePadding)),    'TEMP: {0:0.1f}*C'.format(temperatureDHT),  font=font, fill=255)
 		draw.text((x, heightOLED-(fontSize+linePadding)), 'Humidity: {0:0.1f}%'.format(humidityDHT), font=font, fill=255)
 
-		#if currentTime-lastUploadTime >= uploadTime:	
-		#	postToThingSpeak()
+		if currentTime-lastUploadTime >= uploadTime:	
+			postToThingSpeak()
 
 		disp.image(image)
 		disp.display()
