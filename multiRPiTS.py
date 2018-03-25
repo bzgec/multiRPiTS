@@ -83,13 +83,13 @@ def getCpuTemp():
 	global temp
 	tempLine = os.popen('vcgencmd measure_temp').readline()
 	temp = (tempLine.replace('temp=','').replace("'C\n",""))
-	#print('CPU temperature: {0}'.format(temp))
+	#print('CPU temperature: ' + temp)
 	return temp
 def PIDcontroller(realValue, setPoint):
-	print('realValue: ' + str(realValue))
+	print('realValue (CPU temperature): ' + str(realValue))
 	print('setPoint: ' + str(setPoint))
 	error = realValue - setPoint
-	print('error: ' + str(error))
+	print('error/difference: ' + str(error))
 
 	######################################################
 	# CALCULATING P
@@ -160,12 +160,11 @@ def handleFan():
 	#elif dutyCycle == 100:
 	#	fan('on')
 	print('dutyCycle: {0:0.2f}'.format(dutyCycle))
-	print('')
 	return(cpuTemp, P, I, D)
 def postToThingSpeak():
 	global measurements, tempSum, dutyCycleSum, lastUploadTime, temperatureDHT, humidityDHT, currentTime
 
-
+	print('###################################################')
 	print('Posting to thingspeak.com')
 		
 	#cpu_pc = psutil.cpu_percent()
@@ -192,6 +191,8 @@ def postToThingSpeak():
 		lastUploadTime = currentTime
 	except:
 		print ("connection failed")
+
+	print('###################################################')
 	return()
 def getTempAndHumidity():
 	global temperatureDHT, humidityDHT, x, y, currentTime, lastDHTTime
@@ -222,16 +223,15 @@ try:
 		timeBetween = currentTime - PIDs.previousTime
 		cpuTemp, P, I, D = handleFan()
 
-		if measurements < 10:	# this is because when the raspberry boots up CPU is quite hot and after some cycles it should stabilize, we do not want the the boot CPU temperature displayed in Thing Speak graph
-			tempSum += float(temp)
-			dutyCycleSum += dutyCycle
 
+		tempSum += float(temp)
+		dutyCycleSum += dutyCycle
 		measurements += 1
 
 
 		if currentTime-lastDHTTime >= DHTTime:
 			getTempAndHumidity()
-			# Display image.
+
 			
 		disp.clear()
 		draw.rectangle((0,0,widthOLED,heightOLED), outline=0, fill=0)
@@ -253,6 +253,7 @@ try:
 
 		disp.image(image)
 		disp.display()
+		print('')
 		sleep(sleepDuration)	# goes to sleep for 
 except KeyboardInterrupt:	#CTRL+C = keyboard interrupt
 	pwmFanPin.ChangeDutyCycle(0)
