@@ -7,7 +7,7 @@ from time import sleep
 try:
 	while True:
 		print('###################################')
-		command = 'ps -ef | grep -v grep | grep multi.py'
+		command = 'ps -ef | grep -v grep | grep multiRPiTS.py'
 		anwser = subprocess.getoutput(command)
 		print(anwser)
 
@@ -15,8 +15,8 @@ try:
 			print('Program is running.')
 		else:
 			print('Program is not running...')
-			print('Starting: python /home/pi/scripts/multi.py disable')
-			process = subprocess.Popen('python /home/pi/scripts/multi.py disable', shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+			print('Starting: python /home/pi/scripts/multiRPTS.py disable')
+			process = subprocess.Popen('python /home/pi/scripts/multiRPTS.py disable', shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
 
 		print('Going to sleep for 60s')
 		print('')
