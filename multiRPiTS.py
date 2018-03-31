@@ -14,8 +14,31 @@ from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 
-if sys.argv[1] == 'disable':	# if you run this script and add argument "disable" (python multiRPiTS.py disable)
-	sys.stdout = open(os.devnull, "w")	# suppress console output
+import logging
+import os.path
+
+if not os.path.isfile('/home/pi/logs/multi.log'):
+	if not os.path.isdir('/home/pi/logs'):
+		os.makedirs('/home/pi/logs')
+	file = open('/home/pi/logs/multi.log', 'w')
+	file.close()
+
+for i in sys.argv:
+	if i == 'disable':	# if you run this script and add argument "disable" (python multiRPiTS.py disable)
+		sys.stdout = open(os.devnull, "w")	# suppress console output
+
+formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s', '%Y/%m/%d %H:%M:%S')
+def setup_logger(loggerName, log_file, level=logging.INFO, fileMode='a'):
+	handler = logging.FileHandler(log_file, fileMode)        
+	handler.setFormatter(formatter)
+	logger = logging.getLogger(loggerName)
+	logger.setLevel(level)
+	logger.addHandler(handler)
+	return logger
+
+# set up logging to file
+logger = setup_logger('defaultLogger', '/home/pi/logs/multi.log')
+logger.warning('Program started')
 
 
 
@@ -78,7 +101,6 @@ class PIDs:
 	i = 10
 	d = 30
 	integral = 0
-	#delta_t = 3	# it means that every 3 seconds the program is going to check the temperature set the new speed of the fan
 	previousValue = desiredTemp
 	previousTime = time()
 	currentTime = 0	# it is set before use
@@ -171,6 +193,10 @@ def handleFan():
 	return(cpuTemp, P, I, D)
 def postToThingSpeak():
 	global measurements, tempSum, dutyCycleSum, lastUploadTime, temperatureDHT, humidityDHT, currentTime
+	averageCPUTemp = format(format(tempSum/measurements, '.1f'))
+	averageFanSpeed = format(format(dutyCycleSum/measurements, '.1f'))
+	logger.info('Posting to thingSpeak.com: ' + 'temperature=' + str(temperatureDHT) + ', humidity=' + str(humidityDHT) + ', averageCPUTemp=' + averageCPUTemp + ', averageFanSpeed=' + averageFanSpeed)
+		
 
 	print('###################################################')
 	print('Posting to thingspeak.com')
@@ -179,9 +205,8 @@ def postToThingSpeak():
 	#mem_avail_mb = psutil.avail_phymem()/1000000
 			
 	link = 'https://api.thingspeak.com/update?api_key='
-	data = '&field1=' + str(tempSum/measurements) + '&field2=' + str(dutyCycleSum/measurements) + '&field3=' + str(temperatureDHT) + '&field4=' + str(humidityDHT)
-	print("average CPU temperature: {0:0.1f}*C, average dutyCycle: {1:0.1f}".format(tempSum/measurements, dutyCycleSum/measurements))
-	print("Temperature: {0:0.1f}*C, Humidity: {1:0.1f}%").format(temperatureDHT, humidityDHT)
+	data = '&field1=' + averageCPUTemp + '&field2=' + averageFanSpeed + '&field3=' + str(temperatureDHT) + '&field4=' + str(humidityDHT)
+	print('temperature=' + str(temperatureDHT) + ', humidity=' + str(humidityDHT) + ', averageCPUTemp=' + averageCPUTemp + ', averageFanSpeed=' + averageFanSpeed)
 
 	try:
 		f = urllib.urlopen(link + thingSpeak_WRITE_API_KEY + data)
@@ -194,31 +219,39 @@ def postToThingSpeak():
 		lastUploadTime = currentTime
 	except:
 		print ("connection failed")
+		logger.warning('FAILED to post to ThingSpeak')
 
 	print('###################################################')
 	return()
 def getTempAndHumidity():
 	global temperatureDHT, humidityDHT, x, y, currentTime, lastDHTTime
+	print('###################################################')
+	print('Geting temperature and humidity')
 	# Try to grab a sensor reading.  Use the read_retry method which will retry up
 	# to 15 times to get a sensor reading (waiting 2 seconds between each retry).
 	humidityDHT, temperatureDHT = Adafruit_DHT.read_retry(sensor, DHTpin)
-	
+	humidityDHT = float(format(humidityDHT, '.1f'))
+	temperatureDHT = float(format(temperatureDHT, '.1f'))
 	# Note that sometimes you won't get a reading and
 	# the results will be null (because Linux can't
 	# guarantee the timing of calls to read the sensor).
 	# If this happens try again!
 	if humidityDHT is not None and temperatureDHT is not None:
-		print('Temp: {0:0.1f}*C, Humidity: {1:0.1f}%'.format(temperatureDHT, humidityDHT))
+		print('Temp: ' + str(temperatureDHT) + '*C, Humidity: ' + str(humidityDHT))
+		logger.info('Reading temperature: ' + 'temperature=' + str(temperatureDHT) + ', humidity=' + str(humidityDHT))
 	else:
 		print('Failed to get reading. Try again!')
 		draw.text((x, y),    'FAILED to read DHT',  font=font, fill=255)
+		logger.warning('Reading temperature&humidity FAILED trying adain')
 		humidityDHT, temperatureDHT = Adafruit_DHT.read_retry(sensor, DHTpin)
 		if humidityDHT is not None and temperatureDHT is not None:
-			print('Temp: {0:0.1f}*C, Humidity: {1:0.1f}%'.format(temperatureDHT, humidityDHT))
+			print('Temp: ' + str(temperatureDHT) + '*C, Humidity: ' + str(humidityDHT))
+			logger.warning('Reading FOR SECOND TIME temperature: ' + 'temperature=' + str(temperatureDHT) + ', humidity=' + str(humidityDHT))
 		else:
 			print('Failed to get reading again...')
 			draw.text((x, y),    'FAILED to read DHT',  font=font, fill=255)
 	lastDHTTime = currentTime
+	print('###################################################')
 	return()
 
 try:
@@ -250,11 +283,17 @@ try:
 		y += fontSize + linePadding
 		draw.text((x, y),    'I:{0:0.1f}, PID sum:{1:0.1f}'.format(I, P+I+D),  font=font, fill=255)
 		y += fontSize + linePadding
-		draw.text((x, y),    'D:{0:0.1f}, delta-t:{1:0.1f}'.format(D, timeBetween),  font=font, fill=255)
+		draw.text((x, y),    'D:{0:0.1f}, delta_t:{1:0.1f}'.format(D, timeBetween),  font=font, fill=255)
 		y += fontSize + linePadding
 
 		draw.text((x, heightOLED-2*(fontSize+linePadding)),    'TEMP: {0:0.1f}*C'.format(temperatureDHT),  font=font, fill=255)
 		draw.text((x, heightOLED-(fontSize+linePadding)), 'Humidity: {0:0.1f}%'.format(humidityDHT), font=font, fill=255)
+
+		file = open('/home/pi/logs/dataMulti.log', 'w')
+		file.write('desiredTemp=' +  format(desiredTemp, '.1f') + ', cpuTemp=' + format(cpuTemp) + ', differenceInTemp=' + format(cpuTemp-desiredTemp) + '\n')
+		file.write('P=' + format(P, '.1f') + ', I=' + format(I, '.1f') + ', D=' + format(D, '.1f') + ', PIDsum='+ format(P+I+D, '.1f') + ', delta_t=' + format(timeBetween, '.1f') + '\n')
+		file.write('temperature=' + str(temperatureDHT) + ', humidity=' + str(humidityDHT))
+		file.close()
 
 		if currentTime-lastUploadTime >= uploadTime:	
 			postToThingSpeak()
