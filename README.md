@@ -4,6 +4,10 @@
 - uploading data to https://thingspeak.com/channels/342779 (average CPU temperature, average fan speed, current temperature and humidity of the room in which the Raspberry Pi is located
 - displaying data on OLED display (SSD1306 128x64 screen with I2C)
 
+# runChecker
+Script that checks if multiRPiTS is running every minute, if it is not running it will start it.
+Start this program when Raspberry Pi boots, and change location of your script file (https://www.dexterindustries.com/howto/run-a-program-on-your-raspberry-pi-at-startup/)
+
 # DHT22
 Follow this instrucions for DHT22 sensor (step 7):
 http://www.instructables.com/id/Raspberry-PI-and-DHT22-temperature-and-humidity-lo/
