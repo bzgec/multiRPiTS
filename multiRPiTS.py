@@ -17,10 +17,10 @@ from PIL import ImageFont
 import logging
 import os.path
 
-if not os.path.isfile('/home/pi/logs/multi.log'):
+if not os.path.isfile('/home/pi/logs/multiRPiTS.log'):
 	if not os.path.isdir('/home/pi/logs'):
 		os.makedirs('/home/pi/logs')
-	file = open('/home/pi/logs/multi.log', 'w')
+	file = open('/home/pi/logs/multiRPiTS.log', 'w')
 	file.close()
 
 for i in sys.argv:
@@ -89,7 +89,7 @@ tempSum = 0
 dutyCycleSum = 0
 measurements = 0
 
-thingSpeak_WRITE_API_KEY = 'NLHZCN1XP9M76NNX'
+thingSpeak_WRITE_API_KEY = 'INPUT YOUR API KEY HERE'
 
 DHTTime = 10*60	# reads temperature and humidity every 10 minutes
 uploadTime = 30*60	# uploads data to ThingSpeak every 30 minutes
