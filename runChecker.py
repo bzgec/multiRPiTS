@@ -32,9 +32,9 @@ try:
 			#logging.info('multi.py is running.')
 		else:
 			print('Program is not running...')
-			print('Starting: sudo python /home/pi/scripts/multi.py disable')
+			print('Starting: sudo python /home/pi/scripts/multiRPiTS.py disable')
 			logging.warning('multi.py is NOT running, starting it again')
-			process = subprocess.Popen('python /home/pi/scripts/multi.py disable', shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+			process = subprocess.Popen('python /home/pi/scripts/multiRPiTS.py disable', shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
 
 		print('Going to sleep for 60s')
 		print('')
