@@ -17,9 +17,10 @@ Also enable automatic loading of I2C kernel module:
 https://learn.adafruit.com/adafruits-raspberry-pi-lesson-4-gpio-setup/configuring-i2c
 
 # Changes that you need to make
-If you are going to use this code, change PIDs that will suit your needs (PIDs.p, PIDs.i, PIDs.d).
-Change pins of Raspberry Pi that will suit you best.
-This code is ment to start on boot and run indefinitely (to start it on boot https://www.dexterindustries.com/howto/run-a-program-on-your-raspberry-pi-at-startup/).
+- Change the thingSpeak "Write API Key" (thingSpeak_WRITE_API_KEY).
+- PIDs that will suit your needs (PIDs.p, PIDs.i, PIDs.d).
+- Change pins of Raspberry Pi that will suit you best.
+- This code is ment to start on boot and run indefinitely (to start it on boot https://www.dexterindustries.com/howto/run-a-program-on-your-raspberry-pi-at-startup/).
 
 # Inspired by
 This code was initially inspired by Andreas Spiess and his YouTube channel https://www.youtube.com/channel/UCu7_D0o48KbfhpEohoP7YSQ.
