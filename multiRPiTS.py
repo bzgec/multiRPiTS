@@ -1,10 +1,11 @@
-#! /usr/bin/env python3
+#! /usr/bin/python
 
 import os
+import subprocess
 from time import sleep, time
 import sys
 import RPi.GPIO as GPIO
-import httplib, urllib # open the link 
+import urllib
 import Adafruit_DHT
 
 import Adafruit_SSD1306
@@ -12,6 +13,10 @@ import Adafruit_SSD1306
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
+
+if sys.argv[1] == 'disable':	# if you run this script and add argument "disable" (python multiRPiTS.py disable)
+	sys.stdout = open(os.devnull, "w")	# suppress console output
+
 
 
 ######################################################
@@ -61,6 +66,8 @@ tempSum = 0
 dutyCycleSum = 0
 measurements = 0
 
+thingSpeak_WRITE_API_KEY = 'NLHZCN1XP9M76NNX'
+
 DHTTime = 10*60	# reads temperature and humidity every 10 minutes
 uploadTime = 30*60	# uploads data to ThingSpeak every 30 minutes
 lastDHTTime = 0
@@ -81,7 +88,8 @@ class PIDs:
 
 def getCpuTemp():
 	global temp
-	tempLine = os.popen('vcgencmd measure_temp').readline()
+	#tempLine = os.popen('vcgencmd measure_temp').readline()
+	tempLine = subprocess.check_output('vcgencmd measure_temp', shell=True)
 	temp = (tempLine.replace('temp=','').replace("'C\n",""))
 	#print('CPU temperature: ' + temp)
 	return temp
@@ -170,21 +178,16 @@ def postToThingSpeak():
 	#cpu_pc = psutil.cpu_percent()
 	#mem_avail_mb = psutil.avail_phymem()/1000000
 			
-	params = urllib.urlencode({'field1': tempSum/measurements, 'field2': dutyCycleSum/measurements,'field3': temperatureDHT, 'field4': humidityDHT,'key':'VEC1JDXFY3OWD3CJ'})
-	headers = {"Content-type": "application/x-www-form-urlencoded","Accept": "text/plain"}
-	conn = httplib.HTTPConnection("api.thingspeak.com:80")
+	link = 'https://api.thingspeak.com/update?api_key='
+	data = '&field1=' + str(tempSum/measurements) + '&field2=' + str(dutyCycleSum/measurements) + '&field3=' + str(temperatureDHT) + '&field4=' + str(humidityDHT)
 	print("average CPU temperature: {0:0.1f}*C, average dutyCycle: {1:0.1f}".format(tempSum/measurements, dutyCycleSum/measurements))
 	print("Temperature: {0:0.1f}*C, Humidity: {1:0.1f}%").format(temperatureDHT, humidityDHT)
-        
+
 	try:
-		conn.request("POST", "/update", params, headers)
-		response = conn.getresponse()
-		#print strftime("%a, %d %b %Y %H:%M:%S", localtime())
-		data = response.read()
-		print (response.status, response.reason)
-		conn.close()
+		f = urllib.urlopen(link + thingSpeak_WRITE_API_KEY + data)
+		#f.read()
+		#print(f)
 		print("Posted")
-		#shouldUpload = 0
 		tempSum = 0
 		dutyCycleSum = 0
 		measurements = 0
@@ -199,17 +202,22 @@ def getTempAndHumidity():
 	# Try to grab a sensor reading.  Use the read_retry method which will retry up
 	# to 15 times to get a sensor reading (waiting 2 seconds between each retry).
 	humidityDHT, temperatureDHT = Adafruit_DHT.read_retry(sensor, DHTpin)
-
+	
 	# Note that sometimes you won't get a reading and
 	# the results will be null (because Linux can't
 	# guarantee the timing of calls to read the sensor).
 	# If this happens try again!
 	if humidityDHT is not None and temperatureDHT is not None:
 		print('Temp: {0:0.1f}*C, Humidity: {1:0.1f}%'.format(temperatureDHT, humidityDHT))
-
 	else:
 		print('Failed to get reading. Try again!')
 		draw.text((x, y),    'FAILED to read DHT',  font=font, fill=255)
+		humidityDHT, temperatureDHT = Adafruit_DHT.read_retry(sensor, DHTpin)
+		if humidityDHT is not None and temperatureDHT is not None:
+			print('Temp: {0:0.1f}*C, Humidity: {1:0.1f}%'.format(temperatureDHT, humidityDHT))
+		else:
+			print('Failed to get reading again...')
+			draw.text((x, y),    'FAILED to read DHT',  font=font, fill=255)
 	lastDHTTime = currentTime
 	return()
 
@@ -268,3 +276,4 @@ except KeyboardInterrupt:	#CTRL+C = keyboard interrupt
 	disp.image(image)
 	disp.display()
 	GPIO.cleanup() #resets all GPIO ports used by this program
+	sys.exit(1)
