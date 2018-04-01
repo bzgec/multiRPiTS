@@ -17,10 +17,10 @@ from PIL import ImageFont
 import logging
 import os.path
 
-if not os.path.isfile('/home/pi/logs/multiRPiTS.log'):
+if not os.path.isfile('/home/pi/logs/multi.log'):
 	if not os.path.isdir('/home/pi/logs'):
 		os.makedirs('/home/pi/logs')
-	file = open('/home/pi/logs/multiRPiTS.log', 'w')
+	file = open('/home/pi/logs/multi.log', 'w')
 	file.close()
 
 for i in sys.argv:
@@ -77,6 +77,8 @@ sensor = Adafruit_DHT.DHT22
 DHTpin = 27
 temperatureDHT = 0
 humidityDHT = 0
+tempDHTSum = 0
+humidityDHTSum = 0
 
 fanPin = 17
 
@@ -89,9 +91,9 @@ tempSum = 0
 dutyCycleSum = 0
 measurements = 0
 
-thingSpeak_WRITE_API_KEY = 'INPUT YOUR API KEY HERE'
+thingSpeak_WRITE_API_KEY = 'NLHZCN1XP9M76NNX'
 
-DHTTime = 10*60	# reads temperature and humidity every 10 minutes
+DHTTime = 5*60	# reads temperature and humidity every 10 minutes
 uploadTime = 30*60	# uploads data to ThingSpeak every 30 minutes
 lastDHTTime = 0
 lastUploadTime = 0
@@ -192,10 +194,12 @@ def handleFan():
 	print('dutyCycle: {0:0.2f}'.format(dutyCycle))
 	return(cpuTemp, P, I, D)
 def postToThingSpeak():
-	global measurements, tempSum, dutyCycleSum, lastUploadTime, temperatureDHT, humidityDHT, currentTime
-	averageCPUTemp = format(format(tempSum/measurements, '.1f'))
-	averageFanSpeed = format(format(dutyCycleSum/measurements, '.1f'))
-	logger.info('Posting to thingSpeak.com: ' + 'temperature=' + str(temperatureDHT) + ', humidity=' + str(humidityDHT) + ', averageCPUTemp=' + averageCPUTemp + ', averageFanSpeed=' + averageFanSpeed)
+	global measurements, tempSum, dutyCycleSum, lastUploadTime, tempDHTSum, humidityDHTSum, currentTime
+	averageCPUTemp = format(tempSum/measurements, '.1f')
+	averageFanSpeed = format(dutyCycleSum/measurements, '.1f')
+	averageTempDHT = format(tempDHTSum/measurements, '.1f')
+	averageHumidityDHT = format(humidityDHT/measurements, '.1f')
+	logger.info('Posting to thingSpeak.com: ' + 'averageTempDHT=' + averageTempDHT + ', averageHumidityDHT=' + averageHumidityDHT + ', averageCPUTemp=' + averageCPUTemp + ', averageFanSpeed=' + averageFanSpeed)
 		
 
 	print('###################################################')
@@ -205,8 +209,8 @@ def postToThingSpeak():
 	#mem_avail_mb = psutil.avail_phymem()/1000000
 			
 	link = 'https://api.thingspeak.com/update?api_key='
-	data = '&field1=' + averageCPUTemp + '&field2=' + averageFanSpeed + '&field3=' + str(temperatureDHT) + '&field4=' + str(humidityDHT)
-	print('temperature=' + str(temperatureDHT) + ', humidity=' + str(humidityDHT) + ', averageCPUTemp=' + averageCPUTemp + ', averageFanSpeed=' + averageFanSpeed)
+	data = '&field1=' + averageCPUTemp + '&field2=' + averageFanSpeed + '&field3=' + averageTempDHT + '&field4=' + averageHumidityDHT
+	print('averageTempDHT=' + averageTempDHT + ', averageHumidityDHT=' + averageHumidityDHT + ', averageCPUTemp=' + averageCPUTemp + ', averageFanSpeed=' + averageFanSpeed)
 
 	try:
 		f = urllib.urlopen(link + thingSpeak_WRITE_API_KEY + data)
@@ -224,7 +228,7 @@ def postToThingSpeak():
 	print('###################################################')
 	return()
 def getTempAndHumidity():
-	global temperatureDHT, humidityDHT, x, y, currentTime, lastDHTTime
+	global temperatureDHT, humidityDHT, x, y, currentTime, lastDHTTime, tempDHTSum, humidityDHTSum
 	print('###################################################')
 	print('Geting temperature and humidity')
 	# Try to grab a sensor reading.  Use the read_retry method which will retry up
@@ -251,6 +255,8 @@ def getTempAndHumidity():
 			print('Failed to get reading again...')
 			draw.text((x, y),    'FAILED to read DHT',  font=font, fill=255)
 	lastDHTTime = currentTime
+	tempDHTSum += temperatureDHT
+	humidityDHTSum += humidityDHT
 	print('###################################################')
 	return()
 
