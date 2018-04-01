@@ -1,7 +1,7 @@
 # multiRPiTS.py - multifunction script for Raspberry Pi with ThingSpeak support
 - PID-fan-controller (fan speed dependent on CPU temperature)
 - measuring room temperature and humidity
-- uploading data to https://thingspeak.com/channels/342779 (average CPU temperature, average fan speed, current temperature and humidity of the room in which the Raspberry Pi is located
+- uploading data to https://thingspeak.com/channels/342779 (average CPU temperature, average fan speed, average temperature and average humidity of the room in which the Raspberry Pi is located
 - displaying data on OLED display (SSD1306 128x64 screen with I2C)
 
 # runChecker.py
