@@ -198,7 +198,7 @@ def postToThingSpeak():
 	averageCPUTemp = format(tempSum/measurements, '.1f')
 	averageFanSpeed = format(dutyCycleSum/measurements, '.1f')
 	averageTempDHT = format(tempDHTSum/measurements, '.1f')
-	averageHumidityDHT = format(humidityDHT/measurements, '.1f')
+	averageHumidityDHT = format(humidityDHTSum/measurements, '.1f')
 	logger.info('Posting to thingSpeak.com: ' + 'averageTempDHT=' + averageTempDHT + ', averageHumidityDHT=' + averageHumidityDHT + ', averageCPUTemp=' + averageCPUTemp + ', averageFanSpeed=' + averageFanSpeed)
 		
 
@@ -220,6 +220,8 @@ def postToThingSpeak():
 		tempSum = 0
 		dutyCycleSum = 0
 		measurements = 0
+		humidityDHTSum = 0
+		tempDHTSum = 0
 		lastUploadTime = currentTime
 	except:
 		print ("connection failed")
@@ -228,7 +230,7 @@ def postToThingSpeak():
 	print('###################################################')
 	return()
 def getTempAndHumidity():
-	global temperatureDHT, humidityDHT, x, y, currentTime, lastDHTTime, tempDHTSum, humidityDHTSum
+	global temperatureDHT, humidityDHT, x, y, currentTime, lastDHTTime
 	print('###################################################')
 	print('Geting temperature and humidity')
 	# Try to grab a sensor reading.  Use the read_retry method which will retry up
@@ -242,7 +244,7 @@ def getTempAndHumidity():
 	# If this happens try again!
 	if humidityDHT is not None and temperatureDHT is not None:
 		print('Temp: ' + str(temperatureDHT) + '*C, Humidity: ' + str(humidityDHT))
-		logger.info('Reading temperature: ' + 'temperature=' + str(temperatureDHT) + ', humidity=' + str(humidityDHT))
+		logger.info('Temperature=' + str(temperatureDHT) + ', humidity=' + str(humidityDHT))
 	else:
 		print('Failed to get reading. Try again!')
 		draw.text((x, y),    'FAILED to read DHT',  font=font, fill=255)
@@ -250,13 +252,11 @@ def getTempAndHumidity():
 		humidityDHT, temperatureDHT = Adafruit_DHT.read_retry(sensor, DHTpin)
 		if humidityDHT is not None and temperatureDHT is not None:
 			print('Temp: ' + str(temperatureDHT) + '*C, Humidity: ' + str(humidityDHT))
-			logger.warning('Reading FOR SECOND TIME temperature: ' + 'temperature=' + str(temperatureDHT) + ', humidity=' + str(humidityDHT))
+			logger.warning('Reading FOR SECOND TIME temperature=' + str(temperatureDHT) + ', humidity=' + str(humidityDHT))
 		else:
 			print('Failed to get reading again...')
 			draw.text((x, y),    'FAILED to read DHT',  font=font, fill=255)
 	lastDHTTime = currentTime
-	tempDHTSum += temperatureDHT
-	humidityDHTSum += humidityDHT
 	print('###################################################')
 	return()
 
@@ -271,14 +271,15 @@ try:
 		cpuTemp, P, I, D = handleFan()
 
 
-		tempSum += float(temp)
-		dutyCycleSum += dutyCycle
-		measurements += 1
-
 
 		if currentTime-lastDHTTime >= DHTTime:
 			getTempAndHumidity()
 
+		tempSum += float(temp)
+		dutyCycleSum += dutyCycle
+		tempDHTSum += temperatureDHT
+		humidityDHTSum += humidityDHT
+		measurements += 1
 			
 		disp.clear()
 		draw.rectangle((0,0,widthOLED,heightOLED), outline=0, fill=0)
