@@ -1,16 +1,13 @@
 LINK TO WEB SITE FOR THIS PROJECT: https://bzgec.github.io/multiRPiTS/
 
-# multi.py - multifunction script for Raspberry Pi with ThingSpeak
+# multiRPiTS - multifunction script for Raspberry Pi with ThingSpeak
 - PID-fan-controller (fan speed dependent on CPU temperature)
 - measuring room temperature and humidity
 - uploading data to https://thingspeak.com/channels/342779 (average CPU temperature, fan speed, temperature and humidity of the room in which the Raspberry Pi is located
 - displaying data on OLED display (SSD1306 128x64 screen with I2C)
-- logging data when temperature and humidity are measured and when data is uploaded to ThingSpeak
+- sending mail if some error occurs (for now it is set that mailSender.py script must bi in /home/pi/scripts/ folder... I am going to change that)
 - writing current values to file, so they can be used by some other program
-
-# runChecker.py
-Script that checks if multi.py is running every minute, if it is not running it will start it.
-Start this program when Raspberry Pi boots, and change location of your script file (https://www.dexterindustries.com/howto/run-a-program-on-your-raspberry-pi-at-startup/). It loggs when this script starts and if multi.py is not running.
+- logging data when temperature and humidity are measured and when data is uploaded to ThingSpeak (not right now)
 
 # DHT22
 Follow this instrucions for DHT22 sensor (step 7):
@@ -29,6 +26,10 @@ https://learn.adafruit.com/adafruits-raspberry-pi-lesson-4-gpio-setup/configurin
 - PIDs that will suit your needs (PIDs.p, PIDs.i, PIDs.d).
 - Change pins of Raspberry Pi that will suit you best.
 - This code is ment to start on boot and run indefinitely (to start it on boot https://www.dexterindustries.com/howto/run-a-program-on-your-raspberry-pi-at-startup/).
+
+# runChecker.py (not included right now)
+Script that checks if multi.py is running every minute, if it is not running it will start it.
+Start this program when Raspberry Pi boots, and change location of your script file (https://www.dexterindustries.com/howto/run-a-program-on-your-raspberry-pi-at-startup/). It loggs when this script starts and if multi.py is not running.
 
 # Inspired by
 This code was initially inspired by Andreas Spiess and his YouTube channel https://www.youtube.com/channel/UCu7_D0o48KbfhpEohoP7YSQ.
