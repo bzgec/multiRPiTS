@@ -27,7 +27,7 @@ https://learn.adafruit.com/adafruits-raspberry-pi-lesson-4-gpio-setup/configurin
 - Change pins of Raspberry Pi that will suit you best.
 - This code is ment to start on boot and run indefinitely (to start it on boot https://www.dexterindustries.com/howto/run-a-program-on-your-raspberry-pi-at-startup/).
 
-# ~~runChecker.py (not included right now)~~
+# ~~runChecker.py~~
 ~~Script that checks if multi.py is running every minute, if it is not running it will start it.
 Start this program when Raspberry Pi boots, and change location of your script file (https://www.dexterindustries.com/howto/run-a-program-on-your-raspberry-pi-at-startup/). It loggs when this script starts and if multi.py is not running.~~
 
