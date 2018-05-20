@@ -29,7 +29,7 @@ https://learn.adafruit.com/adafruits-raspberry-pi-lesson-4-gpio-setup/configurin
 
 # ~~runChecker.py (not included right now)
 Script that checks if multi.py is running every minute, if it is not running it will start it.
-Start this program when Raspberry Pi boots, and change location of your script file (https://www.dexterindustries.com/howto/run-a-program-on-your-raspberry-pi-at-startup/). It loggs when this script starts and if multi.py is not running.
+Start this program when Raspberry Pi boots, and change location of your script file (https://www.dexterindustries.com/howto/run-a-program-on-your-raspberry-pi-at-startup/). It loggs when this script starts and if multi.py is not running.~~
 
 # Inspired by
 This code was initially inspired by Andreas Spiess and his YouTube channel https://www.youtube.com/channel/UCu7_D0o48KbfhpEohoP7YSQ.
