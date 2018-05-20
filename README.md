@@ -5,7 +5,7 @@ LINK TO WEB SITE FOR THIS PROJECT: https://bzgec.github.io/multiRPiTS/
 - measuring room temperature and humidity
 - uploading data to https://thingspeak.com/channels/342779 (average CPU temperature, fan speed, temperature and humidity of the room in which the Raspberry Pi is located
 - displaying data on OLED display (SSD1306 128x64 screen with I2C)
-- sending mail if some error occurs (for now it is set that mailSender.py script must bi in /home/pi/scripts/ folder... I am going to change that)
+- sending mail if some error occurs (for now it is set that mailSender.py script must be located in /home/pi/scripts/ folder... I am going to change that)
 - writing current values to file, so they can be used by some other program
 - ~~logging data when temperature and humidity are measured and when data is uploaded to ThingSpeak~~
 
