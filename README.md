@@ -14,6 +14,7 @@ Follow this instrucions for DHT22 sensor (step 7):
 http://www.instructables.com/id/Raspberry-PI-and-DHT22-temperature-and-humidity-lo/
 
 # SSD1306 display
+Be careful with OLED display burn-in!
 Follow this instructions to install everything that SSD1306 display needs to work with my code:
 https://learn.adafruit.com/ssd1306-oled-displays-with-raspberry-pi-and-beaglebone-black/wiring
 https://learn.adafruit.com/ssd1306-oled-displays-with-raspberry-pi-and-beaglebone-black/usage
@@ -22,10 +23,16 @@ Also enable automatic loading of I2C kernel module:
 https://learn.adafruit.com/adafruits-raspberry-pi-lesson-4-gpio-setup/configuring-i2c
 
 # Changes that you need to make
+## Raspberry Pi
+- This code is ment to start on boot and run indefinitely (to start it on boot https://www.dexterindustries.com/howto/run-a-program-on-your-raspberry-pi-at-startup/).
+## multiProc/variablesConfig.py
+- Change paths to files.
+- Change email address
 - Change the thingSpeak "Write API Key" (thingSpeak_WRITE_API_KEY).
 - PIDs that will suit your needs (PIDs.p, PIDs.i, PIDs.d).
 - Change pins of Raspberry Pi that will suit you best.
-- This code is ment to start on boot and run indefinitely (to start it on boot https://www.dexterindustries.com/howto/run-a-program-on-your-raspberry-pi-at-startup/).
+## mailSender/mailConfig.py
+- Change FROM_EMAIL_ADDRESS and PASSWORD to gmail from which you want to send mails.
 
 # ~~runChecker.py~~
 ~~Script that checks if multi.py is running every minute, if it is not running it will start it.
